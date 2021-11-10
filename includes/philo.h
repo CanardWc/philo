@@ -6,6 +6,7 @@
 # include <errno.h>
 # include <string.h>
 # include <pthread.h>
+# include <sys/time.h>
 
 typedef struct	s_sets
 {
@@ -14,6 +15,9 @@ typedef struct	s_sets
 	int	t_eat;
 	int	t_sleep;
 	int	must_eat;
+
+	int	*forks;
+	int	nbr;
 }		t_sets;
 
 void	ph_error();
