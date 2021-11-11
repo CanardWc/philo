@@ -10,18 +10,22 @@
 
 typedef struct	s_sets
 {
-	int	n_philo;
-	int	t_die;
-	int	t_eat;
-	int	t_sleep;
-	int	must_eat;
+	int				n_philo;
+	int				t_die;
+	int				t_eat;
+	int				t_sleep;
+	int				must_eat;
+	int				start_time;
+	
+	int				nbr;
+	int				time;
 
-	int	*forks;
-	int	nbr;
-}		t_sets;
+	pthread_mutex_t	*life;	
+	pthread_mutex_t	*forks;
+}	t_sets;
 
 void	ph_error();
 
-void	ph_logic();
+void	ph_logic(t_sets *data);
 
 #endif
