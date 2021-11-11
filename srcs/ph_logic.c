@@ -25,11 +25,13 @@ void	eating(t_sets *data)
 void	*ph_alive(void *arg)
 {
 	t_sets	data;
-	int		time;
+	int	time;
 
 	data = *(t_sets *)(arg);
 	data.t_sleep = 3;
 	ft_printf("coucou\n");
+	if (gettimeofday(&time))
+		ph_error();
 	while (data.must_eat != 0)
 	{
 		ph_eating(&data);
