@@ -29,7 +29,6 @@ void	ph_check_args(int ac, char **av)
 t_sets	ph_get_static_data(int ac, char **av)
 {
 	t_sets			data;
-	struct timeval	time;
 	int				i;
 
 	if (ft_atoi(av[1]) <= 0)
@@ -42,9 +41,7 @@ t_sets	ph_get_static_data(int ac, char **av)
 	data.t_eat = ft_atoi(av[3]);
 	data.t_die = ft_atoi(av[2]);
 	data.n_philo = ft_atoi(av[1]);
-	if (gettimeofday(&time, NULL))
-		ph_error();
-	data.start_time = time.tv_usec / 1000;
+	data.start_time = ph_get_time();
 	data.forks = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * data.n_philo);
 	if (!data.forks)
 		ph_error();
@@ -62,13 +59,6 @@ t_sets	*ph_get_data(int ac, char **av)
 	int				i;
 
 	data = ph_get_static_data(ac, av);
-	data.life = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * data.n_philo);
-	if (!data.life)
-		ph_error();
-	i = 0;
-	while (i < data.n_philo)
-		if (pthread_mutex_init(&data.life[i++], NULL))
-			ph_error();
 	ret = (t_sets *)malloc(sizeof(t_sets) * data.n_philo);
 	if (!ret)
 		ph_error();
@@ -76,7 +66,7 @@ t_sets	*ph_get_data(int ac, char **av)
 	while (++i < data.n_philo)
 	{
 		ret[i] = data;
-		ret[i].nbr = i + 1;
+		ret[i].nbr = i;
 	}
 	return (ret);
 }

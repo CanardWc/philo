@@ -13,7 +13,7 @@ SRC_PATH = ./srcs/
 LFT_NAME = libft.a
 OBJ_NAME = $(SRC_NAME:.c=.o)
 INC_NAME = philo.h
-SRC_NAME = philo.c ph_logic.c
+SRC_NAME = philo.c ph_logic.c ph_utils.c
 
 LFT = $(addprefix $(LFT_PATH),$(LFT_NAME))
 SRC = $(addprefix $(SRC_PATH),$(SRC_NAME))

@@ -20,11 +20,16 @@ typedef struct	s_sets
 	int				nbr;
 	int				time;
 
-	pthread_mutex_t	*life;	
+	pthread_mutex_t	life;	
 	pthread_mutex_t	*forks;
 }	t_sets;
 
 void	ph_error();
+
+int		ph_get_time();
+void	ph_update_time(t_sets *data);
+int		ph_check_death(t_sets data, int death);
+void	ph_talking(t_sets data, char *str, int death);
 
 void	ph_logic(t_sets *data);
 
