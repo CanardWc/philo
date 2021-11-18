@@ -20,6 +20,7 @@ typedef struct	s_sets
 	int		start_time;
 	
 	int		nbr;
+	int		t_fork;
 	int		time;
 
 	pthread_mutex_t *talk;

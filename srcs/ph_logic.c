@@ -6,11 +6,17 @@
 /*   By: fgrea <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/11 11:32:10 by fgrea             #+#    #+#             */
-/*   Updated: 2021/11/16 18:27:42 by fgrea            ###   ########lyon.fr   */
+/*   Updated: 2021/11/18 17:03:47 by fgrea            ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <philo.h>
+
+/*
+ *	This fonction give a better precision, it converts and assembles 
+ *		seconds and microseconds given by gettimeofday() for more details on 
+ *		actual time.
+ */
 
 int	ph_get_time()
 {
@@ -20,6 +26,10 @@ int	ph_get_time()
 		ph_error();
 	return (time.tv_sec * 1000 + time.tv_usec / 1000);
 }
+
+/*
+ *	Function for the case of 1 philo, it kill it in a safe way.
+ */
 
 void	*ph_kill_the_philo(t_sets data)
 {
@@ -31,12 +41,17 @@ void	*ph_kill_the_philo(t_sets data)
 	return (NULL);
 }
 
+/*
+ *	Routine function for each thread.
+ */
+
 void	*ph_life(void *arg)
 {
 	t_sets	data;
 
 	data = *(t_sets *)(arg);
 	data.time = 0;
+	data.t_fork = 0;
 	if (data.n_philo == 1)
 		return (ph_kill_the_philo(data));
 	while (data.must_eat != 0)
@@ -44,6 +59,7 @@ void	*ph_life(void *arg)
 		data.time = ph_eating(data);
 		if (data.time < 0)
 			break;
+		data.t_fork = ph_get_time() - data.start_time - data.time - data.t_eat;
 		if (data.must_eat > 0)
 			data.must_eat--;
 		if (ph_sleeping_and_thinking(data))
@@ -51,6 +67,10 @@ void	*ph_life(void *arg)
 	}
 	return (NULL);
 }
+
+/*
+ *	The logic function of our program, it launches the threads.
+ */
 
 void	ph_logic(t_sets *data)
 {
@@ -62,17 +82,11 @@ void	ph_logic(t_sets *data)
 		ph_error();
 	i = -1;
 	while (++i < data->n_philo)
-	{
 		if (pthread_create(&thread_ids[i], NULL, &ph_life, &data[i]))
 			ph_error();
-		//	if (!(i % 2))
-		//		usleep(20);
-	}
 	i = 0;
 	while (i < data->n_philo)
 		if (pthread_join(thread_ids[i++], NULL))
 			ph_error();
 	free(thread_ids);
-	free(data->forks);
-	free(data);
 }
