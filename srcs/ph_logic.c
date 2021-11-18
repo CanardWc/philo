@@ -6,7 +6,7 @@
 /*   By: fgrea <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/11 11:32:10 by fgrea             #+#    #+#             */
-/*   Updated: 2021/11/18 17:03:47 by fgrea            ###   ########lyon.fr   */
+/*   Updated: 2021/11/18 17:56:06 by fgrea            ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ void	*ph_kill_the_philo(t_sets data)
 
 /*
  *	Routine function for each thread.
+ *	the philosophers waits till they are all set up.
  */
 
 void	*ph_life(void *arg)
@@ -51,7 +52,11 @@ void	*ph_life(void *arg)
 
 	data = *(t_sets *)(arg);
 	data.time = 0;
-	data.t_fork = 0;
+	while (ph_get_time() - data.start_time < (data.n_philo * 100))
+		;
+	if ((data.nbr % 2))
+		usleep(500);
+	data.start_time = ph_get_time();
 	if (data.n_philo == 1)
 		return (ph_kill_the_philo(data));
 	while (data.must_eat != 0)
@@ -59,7 +64,6 @@ void	*ph_life(void *arg)
 		data.time = ph_eating(data);
 		if (data.time < 0)
 			break;
-		data.t_fork = ph_get_time() - data.start_time - data.time - data.t_eat;
 		if (data.must_eat > 0)
 			data.must_eat--;
 		if (ph_sleeping_and_thinking(data))
