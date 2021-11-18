@@ -1,38 +1,59 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ph_utils.c                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: fgrea <marvin@42.fr>                       +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/11/11 09:39:42 by fgrea             #+#    #+#             */
-/*   Updated: 2021/11/16 18:27:41 by fgrea            ###   ########lyon.fr   */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include <philo.h>
 
-int	ph_get_time()
+void	ft_putchar_fd(char c, int fd)
 {
-	struct timeval	time;
-
-	if (gettimeofday(&time, NULL))
-		ph_error();
-	return (time.tv_sec * 1000 + time.tv_usec / 1000);
+	write(fd, &c, 1);
 }
 
-void	ph_update_time(t_sets *data)
+void	ft_putnbr_fd(int n, int fd)
 {
-	int	time;
+	unsigned int	nb;
 
-	time = ph_get_time();
-	data->time = time - data->start_time;
+	if (n < 0)
+		nb = n * -1;
+	else
+		nb = n;
+	if (n < 0)
+		ft_putchar_fd('-', fd);
+	if (nb > 9)
+		ft_putnbr_fd(nb / 10, fd);
+	ft_putchar_fd((nb % 10) + 48, fd);
 }
 
-void	ph_talking(t_sets data, char *str, int death)
+int	ft_strlen(char *s)
 {
-	if (!death || death == 3)
-		printf("%d %d %s", ph_get_time() - data.start_time, data.nbr + 1, str);
-	if (death == 3)
-		usleep(data.t_die * 1000);
+	int	i;
+
+	i = 0;
+	while (s && s[i])
+		i++;
+	return (i);
+}
+
+int 	ft_atoi(const char *str)
+{
+	int	ret;
+	int	neg;
+
+	ret = 0;
+	if (!str)
+		return (0);
+	if (*str == '-')
+		neg = -1;
+	else
+		neg = 1;
+	if (*str == '-' || *str == '+')
+		str++;
+	while (*str)
+		ret = (ret * 10) + (*str++ - 48);
+	return (ret * neg);
+}
+
+int		ft_strncmp(const char *s1, const char *s2, size_t n)
+{
+	if (n == 0)
+		return (0);
+	return ((*s1 && *s2 && *s1 == *s2 && n > 0) ? \
+		ft_strncmp(++s1, ++s2, --n) : \
+		(unsigned char)(*s1) - (unsigned char)(*s2));
 }

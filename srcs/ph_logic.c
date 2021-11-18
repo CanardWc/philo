@@ -12,74 +12,42 @@
 
 #include <philo.h>
 
-int	death = 0;
-
-int	ph_check_death(t_sets data, int death)
+int	ph_get_time()
 {
-	if (data.n_philo == 1)
-	{
-		ph_talking(data, "has taken a fork\n", death);
-		usleep(data.t_die * 1000);
-		ph_talking(data, "died\n", death);
-		death = 1;
-		return (-1);
-	}
-	if (death > 0)
-		return (-1);
-	printf("check death : %d\n", (ph_get_time() - data.start_time) - data.time);
-	if (((ph_get_time() - data.start_time) - data.time) > data.t_die)
-	{
-		if (!death)
-			ph_talking(data, "died\n", death);
-		death = 1;
-		return (-1);
-	}
-	return (0);
+	struct timeval	time;
+
+	if (gettimeofday(&time, NULL))
+		ph_error();
+	return (time.tv_sec * 1000 + time.tv_usec / 1000);
 }
 
-int	ph_eating(t_sets *data)
+void	*ph_kill_the_philo(t_sets data)
 {
-	pthread_mutex_lock(&data->forks[data->nbr]);
-	if (ph_check_death(*data, death))
-		return (-1);
-	ph_talking(*data, "has taken a fork\n", death);
-	if (data->nbr + 1 >= data->n_philo)
-		pthread_mutex_lock(&data->forks[0]);
-	else
-		pthread_mutex_lock(&data->forks[data->nbr + 1]);
-	if (ph_check_death(*data, death))
-		return (-1);
-	ph_talking(*data, "has taken a fork\n", death);
-	ph_talking(*data, "is eating\n", death);
-	usleep(data->t_eat * 1000);
-	pthread_mutex_unlock(&data->forks[data->nbr]);
-	if (data->nbr + 1 >= data->n_philo)
-		pthread_mutex_unlock(&data->forks[0]);
-	else
-		pthread_mutex_unlock(&data->forks[data->nbr + 1]);
-	if (data->must_eat > 0)
-		data->must_eat--;
-	return (0);
+	pthread_mutex_lock(&data.forks[data.nbr]);
+	ph_talking(data, "has taken a fork\n");
+	while ((ph_get_time() - data.start_time) < data.t_die)
+		;
+	ph_talking(data, "died\n");
+	return (NULL);
 }
 
-void	*ph_alive(void *arg)
+void	*ph_life(void *arg)
 {
 	t_sets	data;
 
 	data = *(t_sets *)(arg);
 	data.time = 0;
-	while (data.n_philo != 1 && data.must_eat != 0)
+	if (data.n_philo == 1)
+		return (ph_kill_the_philo(data));
+	while (data.must_eat != 0)
 	{
-		if (ph_check_death(data, death))
+		data.time = ph_eating(data);
+		if (data.time < 0)
 			break;
-		if (ph_eating(&data))
+		if (data.must_eat > 0)
+			data.must_eat--;
+		if (ph_sleeping_and_thinking(data))
 			break;
-		ph_update_time(&data);
-		ph_talking(data, "is sleeping\n", death);
-		usleep(data.t_sleep * 1000);
-		if (ph_check_death(data, death))
-			break;
-		ph_talking(data, "is thinking\n", death);
 	}
 	return (NULL);
 }
@@ -95,10 +63,10 @@ void	ph_logic(t_sets *data)
 	i = -1;
 	while (++i < data->n_philo)
 	{
-		if (pthread_create(&thread_ids[i], NULL, &ph_alive, &data[i]))
+		if (pthread_create(&thread_ids[i], NULL, &ph_life, &data[i]))
 			ph_error();
-		if (!(i % 2))
-			usleep(20);
+		//	if (!(i % 2))
+		//		usleep(20);
 	}
 	i = 0;
 	while (i < data->n_philo)

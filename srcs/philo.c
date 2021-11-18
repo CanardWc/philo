@@ -28,8 +28,9 @@ void	ph_check_args(int ac, char **av)
 
 t_sets	ph_get_static_data(int ac, char **av)
 {
-	t_sets			data;
-	int				i;
+	t_sets		data;
+	//pthread_mutex_t	talk;
+	int		i;
 
 	if (ft_atoi(av[1]) <= 0)
 		ph_error();
@@ -42,7 +43,12 @@ t_sets	ph_get_static_data(int ac, char **av)
 	data.t_die = ft_atoi(av[2]);
 	data.n_philo = ft_atoi(av[1]);
 	data.start_time = ph_get_time();
-	data.forks = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * data.n_philo);
+	data.talk = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
+	if (pthread_mutex_init(data.talk, NULL))
+		ph_error();
+	//*data.talk = talk;
+	data.forks = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * \
+			data.n_philo);
 	if (!data.forks)
 		ph_error();
 	i = 0;
@@ -80,11 +86,12 @@ int	main(int ac, char **av)
 
 	//get data
 	data = ph_get_data(ac, av);
-	ft_printf("n_philo = %d\n", data->n_philo);
-	ft_printf("t_die = %d\n", data->t_die);
-	ft_printf("t_eat = %d\n", data->t_eat);
-	ft_printf("t_sleep = %d\n", data->t_sleep);
-	ft_printf("must_eat = %d\n", data->must_eat);
+	printf("n_philo = %d\n", data->n_philo);
+	printf("t_die = %d\n", data->t_die);
+	printf("t_eat = %d\n", data->t_eat);
+	printf("t_sleep = %d\n", data->t_sleep);
+	printf("start_time = %d\n", data->start_time);
+	printf("must_eat = %d\n", data->must_eat);
 
 	//launching logic
 	ph_logic(data);
