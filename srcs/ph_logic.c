@@ -93,4 +93,6 @@ void	ph_logic(t_sets *data)
 		if (pthread_join(thread_ids[i++], NULL))
 			ph_error();
 	free(thread_ids);
+	free(data->forks);
+	free(data);
 }
